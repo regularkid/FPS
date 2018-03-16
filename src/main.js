@@ -1,6 +1,6 @@
 aw.init(640, 480, 60, update);
 
-var x = 0; 
+var x = 0;
 var vx = 200.0;
 var size = 50;
 function update(delta)
