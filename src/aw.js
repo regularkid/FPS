@@ -1,7 +1,5 @@
-let aw = (function()
+var aw = (function(public)
 {
-    let public = {};
-
     let m_lastTime = 0;
   
     public.init = (width, height, fps, state) =>
@@ -36,4 +34,4 @@ let aw = (function()
     }
      
     return public;
-}());
+}(aw || {}));
