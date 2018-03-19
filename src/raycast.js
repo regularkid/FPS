@@ -45,7 +45,7 @@ var aw = (function(public)
             let timeout = 20;
             while (xCur >= 0 && xCur < 5 && yCur >= 0 && yCur < 5 && timeout > 0)
             {
-                var xWall = Math.floor(xCur);// + (cosAngle >= 0.0 ? 0 : -1));
+                var xWall = Math.floor(xCur + (cosAngle >= 0.0 ? 0 : -1));
                 var yWall = Math.floor(yCur);
         
                 // Is this point inside a wall block?

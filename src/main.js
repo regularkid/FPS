@@ -9,38 +9,62 @@ aw.initRaycaster();
 var wallTexture = aw.loadTexture("assets/wall.png");
 var playerAngle = 0;
 
+var left = false;
+var right = false;
+var up = false;
+var down = false;
 window.addEventListener("keydown", e =>
 {
     if (event.defaultPrevented)
     {
-        return; // Do nothing if the event was already processed
+        return;
     }
   
     switch (event.key)
     {
-      case "ArrowDown":
-        // code for "down arrow" key press.
-        break;
-      case "ArrowUp":
-        // code for "up arrow" key press.
-        break;
-      case "ArrowLeft":
-        playerAngle++;
-        break;
-      case "ArrowRight":
-        playerAngle--;
-        break;
-      default:
-        return; // Quit when this doesn't handle the key event.
+      case "ArrowDown": down = true; break;
+      case "ArrowUp": up = true; break;
+      case "ArrowLeft": left = true; break;
+      case "ArrowRight": right = true; break;
+      default: return;
     }
   
     // Cancel the default action to avoid it being handled twice
     event.preventDefault();
-  }, true);
+}, true);
+
+window.addEventListener("keyup", e =>
+{
+    if (event.defaultPrevented)
+    {
+        return;
+    }
+  
+    switch (event.key)
+    {
+      case "ArrowDown": down = false; break;
+      case "ArrowUp": up = false; break;
+      case "ArrowLeft": left = false; break;
+      case "ArrowRight": right = false; break;
+      default: return;
+    }
+  
+    // Cancel the default action to avoid it being handled twice
+    event.preventDefault();
+}, true);
 
 aw.state = update;
 function update(delta)
 {
+    let turnSpeed = 50.0;
+    if (left)
+    {
+        playerAngle += turnSpeed * delta;
+    }
+    else if (right)
+    {
+        playerAngle -= turnSpeed * delta;
+    }
     aw.raycast(wallTexture, playerAngle);
     // let wallWidth = 256.0;
     // for (let i = 0; i < 640; i++)
