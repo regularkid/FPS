@@ -1,12 +1,9 @@
 var aw = (function(public)
 {
-    let m_numColumns;
-    let m_columnSize;
-
     public.initRenderer = function(numColumns)
     {
-        m_numColumns = numColumns;
-        m_columnSize = public.width / numColumns;
+        public.numColumns = numColumns;
+        public.columnSize = public.width / numColumns;
     }
 
     public.loadTexture = function(src)
@@ -24,10 +21,11 @@ var aw = (function(public)
         let srcX = texture.width * u1;
         let srcY = texture.height * v1;
 
-        let dstWidth = m_columnSize;
+        let dstWidth = public.columnSize;
         let dstHeight = height;
-        let dstX = columnIdx * m_columnSize;
+        let dstX = columnIdx * public.columnSize;
         let dstY = top;
+
         public.ctx.drawImage(texture, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth, dstHeight);
     }
     
