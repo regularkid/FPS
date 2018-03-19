@@ -18,7 +18,7 @@ var aw = (function(public)
     public.raycast = (wallTexture, xMap, yMap, angle) =>
     {
         // TEMP
-        let fov = 45;
+        let fov = 55;
 
         let startAngle = angle + (fov * 0.5);
         let angleStep = fov / public.numColumns;
