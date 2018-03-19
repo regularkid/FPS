@@ -15,12 +15,10 @@ var aw = (function(public)
         }
     }
 
-    public.raycast = (wallTexture, angle) =>
+    public.raycast = (wallTexture, xMap, yMap, angle) =>
     {
         // TEMP
-        let xMap = 2.5;
-        let yMap = 2.5;
-        let fov = 60;
+        let fov = 45;
 
         let startAngle = angle + (fov * 0.5);
         let angleStep = fov / public.numColumns;
@@ -34,30 +32,65 @@ var aw = (function(public)
             let distHit = -1;
             let xHit = -1;
             let yHit = -1;
+            let u1 = 0.0;
 
             // Vertical grid lines
             let slope = sinAngle / cosAngle;
             let xStep = cosAngle >= 0.0 ? 1 : -1;
             let yStep = xStep * slope;            
-            var xCur = cosAngle >= 0.0 ? Math.ceil(xMap) : Math.floor(xMap);
-	        var yCur = yMap + (xCur - xMap) * slope;
+            let xCur = cosAngle >= 0.0 ? Math.ceil(xMap) : Math.floor(xMap);
+	        let yCur = yMap + (xCur - xMap) * slope;
 
             let timeout = 20;
-            while (xCur >= 0 && xCur < 5 && yCur >= 0 && yCur < 5 && timeout > 0)
+            while (isFinite(slope) && !isNaN(slope) && xCur >= 0 && xCur < 5 && yCur >= 0 && yCur < 5 && timeout > 0)
             {
-                var xWall = Math.floor(xCur + (cosAngle >= 0.0 ? 0 : -1));
-                var yWall = Math.floor(yCur);
+                let xWall = Math.floor(xCur + (cosAngle >= 0.0 ? 0 : -1));
+                let yWall = Math.floor(yCur);
         
-                // Is this point inside a wall block?
-                if (m_grid[yWall][xWall] > 0)
+                if (m_grid[yWall] !== undefined && m_grid[yWall][xWall] !== undefined && m_grid[yWall][xWall] > 0)
                 {
-                    var xDist = xCur - xMap;
-                    var yDist = yCur - yMap;
+                    let xDist = xCur - xMap;
+                    let yDist = yCur - yMap;
                     
                     distHit = Math.sqrt(xDist*xDist + yDist*yDist);
                     xHit = xCur;
                     yHit = yCur;
+                    u1 = yHit % 1.0;
                     break;
+                }
+
+                xCur += xStep;
+                yCur += yStep;
+
+                timeout--;
+            }
+
+            // Horizontal grid lines
+            slope = cosAngle / sinAngle;
+            yStep = sinAngle >= 0.0 ? 1 : -1;
+            xStep = yStep * slope;
+            yCur = sinAngle >= 0.0 ? Math.ceil(yMap) : Math.floor(yMap);
+	        xCur = xMap + (yCur - yMap) * slope;
+
+            timeout = 20;
+            while (isFinite(slope) && !isNaN(slope) && xCur >= 0 && xCur < 5 && yCur >= 0 && yCur < 5 && timeout > 0)
+            {
+                let yWall = Math.floor(yCur + (sinAngle >= 0.0 ? 0 : -1));
+                let xWall = Math.floor(xCur);
+
+                if (m_grid[yWall] !== undefined && m_grid[yWall][xWall] !== undefined && m_grid[yWall][xWall] > 0)
+                {
+                    let xDist = xCur - xMap;
+                    let yDist = yCur - yMap;
+                    let dist = Math.sqrt(xDist*xDist + yDist*yDist);
+                    if (distHit < 0.0 || dist < distHit)
+                    {
+                        distHit = dist;
+                        xHit = xCur;
+                        yHit = yCur;
+                        u1 = xHit % 1.0;
+                        break;
+                    }
                 }
 
                 xCur += xStep;
@@ -68,52 +101,15 @@ var aw = (function(public)
 
             if (distHit >= 0.0)
             {
-                let u1 = yHit % 1.0;
                 let v1 = 0.0;
                 let u2 = u1 + (1.0 / public.numColumns);
                 let v2 = 1.0;
-                let height = (300 / (distHit));// * cosAngle));
+                let fishEyeCorrection = Math.cos((angle - curAngleDeg) * (Math.PI / 180));
+                let height = (300 / (distHit * fishEyeCorrection));
                 let top = (public.height - height) * 0.5;
                 aw.drawColumn(i, top, height, wallTexture, u1, v1, u2, v2);
                 //console.log(`${i} - ${curAngleDeg} dist: ${distHit} - ${distHit * cosAngle}`);
             }
-
-                // let xDist = Math.abs(xEdge - xMap);
-                // let yDist = Math.abs(yEdge - yMap);
-                // if (xDist < yDist)
-                // {
-                //     if (m_grid[yCur][xCur] === 1)
-                //     {
-                //         let u1 = (xDist * yStep) % 1.0;
-                //         let v1 = 0.0;
-                //         let u2 = u1 + (1.0 / public.numColumns);
-                //         let v2 = 1.0;
-                //         aw.drawColumn(i, 90, 300, wallTexture, u1, v1, u2, v2);
-                //         break;
-                //     }
-                //     else
-                //     {
-                //         xEdge += xStep;
-                //         xCur += xStep >= 0.0 ? 1 : -1;
-                //     }
-                // }
-                // else
-                // {
-                //     if (m_grid[yCur][xCur] === 1)
-                //     {
-                //         let u1 = (yDist * xStep) % 1.0;
-                //         let v1 = 0.0;
-                //         let u2 = u1 + (1.0 / public.numColumns);
-                //         let v2 = 1.0;
-                //         //aw.drawColumn(i, 90, 300, wallTexture, u1, v1, u2, v2);
-                //         break;
-                //     }
-                //     else
-                //     {
-                //         yEdge += yStep;
-                //         yCur += yStep >= 0.0 ? 1 : -1;
-                //     }
-                // }
         }
     }
      

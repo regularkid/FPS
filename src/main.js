@@ -7,6 +7,8 @@ aw.initRenderer(screenWidth);
 aw.initRaycaster();
 
 var wallTexture = aw.loadTexture("assets/wall.png");
+var playerX = 2.5;
+var playerY = 2.5;
 var playerAngle = 0;
 
 var left = false;
@@ -56,6 +58,7 @@ window.addEventListener("keyup", e =>
 aw.state = update;
 function update(delta)
 {
+    // TEMP!
     let turnSpeed = 50.0;
     if (left)
     {
@@ -65,15 +68,18 @@ function update(delta)
     {
         playerAngle -= turnSpeed * delta;
     }
-    aw.raycast(wallTexture, playerAngle);
-    // let wallWidth = 256.0;
-    // for (let i = 0; i < 640; i++)
-    // {
-    //     // TEMP
-    //     let u1 = (i / wallWidth) % 1.0;
-    //     let v1 = 0.0;
-    //     let u2 = u1 + (1.0 / wallWidth);
-    //     let v2 = 1.0;
-    //     aw.drawColumn(i, 90, 300, wallTexture, u1, v1, u2, v2);
-    // }
+
+    // TEMP!
+    let moveSpeed = 1.0 * delta;
+    if (up)
+    {
+        playerX += Math.cos(playerAngle * (Math.PI / 180.0)) * moveSpeed;
+        playerY -= Math.sin(playerAngle * (Math.PI / 180.0)) * moveSpeed;
+    }
+    else if (down)
+    {
+        playerX -= Math.cos(playerAngle * (Math.PI / 180.0)) * moveSpeed;
+        playerY += Math.sin(playerAngle * (Math.PI / 180.0)) * moveSpeed;
+    }
+    aw.raycast(wallTexture, playerX, playerY, playerAngle);
 }
