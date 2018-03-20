@@ -6,6 +6,13 @@ aw.init(screenWidth, screenHeight, fps);
 aw.initRenderer(screenWidth);
 aw.initRaycaster();
 
+aw.canvas.requestPointerLock = aw.canvas.requestPointerLock || aw.canvas.mozRequestPointerLock;
+//aw.canvas.requestPointerLock()
+aw.canvas.onclick = function()
+{
+    aw.canvas.requestPointerLock();
+}
+
 var wallTexture = aw.loadTexture("assets/wall.png");
 var playerX = 2.5;
 var playerY = 2.5;
@@ -17,69 +24,95 @@ var up = false;
 var down = false;
 window.addEventListener("keydown", e =>
 {
-    if (event.defaultPrevented)
+    if (e.defaultPrevented)
     {
         return;
     }
   
-    switch (event.key)
+    switch (e.key)
     {
-      case "ArrowDown": down = true; break;
-      case "ArrowUp": up = true; break;
-      case "ArrowLeft": left = true; break;
-      case "ArrowRight": right = true; break;
-      default: return;
+        case "a": left = true; break;
+        case "d": right = true; break;
+        case "w": up = true; break;
+        case "s": down = true; break;
+        default: return;
     }
   
-    // Cancel the default action to avoid it being handled twice
-    event.preventDefault();
+    e.preventDefault();
 }, true);
 
 window.addEventListener("keyup", e =>
 {
-    if (event.defaultPrevented)
+    if (e.defaultPrevented)
     {
         return;
     }
   
-    switch (event.key)
+    switch (e.key)
     {
-      case "ArrowDown": down = false; break;
-      case "ArrowUp": up = false; break;
-      case "ArrowLeft": left = false; break;
-      case "ArrowRight": right = false; break;
-      default: return;
+        case "a": left = false; break;
+        case "d": right = false; break;
+        case "w": up = false; break;
+        case "s": down = false; break;
+        default: return;
     }
   
-    // Cancel the default action to avoid it being handled twice
-    event.preventDefault();
+    e.preventDefault();
+}, true);
+
+var mouseLast;
+var mouseDelta = {x: 0, y: 0};
+window.addEventListener("mousemove", e =>
+{
+    // if (mouseLast !== undefined)
+    // {
+    //     mouseDelta.x += e.clientX - mouseLast.x;
+    //     mouseDelta.y += e.clientY - mouseLast.y;
+    // }
+    mouseDelta.x += e.movementX;
+    mouseDelta.y += e.movementY;
+    mouseLast = {x: e.clientX, y: e.clientY};
 }, true);
 
 aw.state = update;
 function update(delta)
 {
     // TEMP!
-    let turnSpeed = 50.0;
-    if (left)
+    if (mouseDelta !== undefined)
     {
-        playerAngle += turnSpeed * delta;
+        let turnSpeed = 5.0;
+        playerAngle -= turnSpeed * delta * mouseDelta.x;
+        playerAngle = playerAngle % 360.0;
+        mouseDelta.x = 0.0;
+        mouseDelta.y = 0.0;
     }
-    else if (right)
-    {
-        playerAngle -= turnSpeed * delta;
-    }
+
+    let fwdDir = {x: Math.cos(playerAngle * (Math.PI / 180.0)), y: -Math.sin(playerAngle * (Math.PI / 180.0))};
+    let rightDir = {x: -fwdDir.y, y: fwdDir.x};
 
     // TEMP!
     let moveSpeed = 1.0 * delta;
+    if (left)
+    {
+        playerX -= rightDir.x * moveSpeed;
+        playerY -= rightDir.y * moveSpeed;
+    }
+    else if (right)
+    {
+        playerX += rightDir.x * moveSpeed;
+        playerY += rightDir.y * moveSpeed;
+    }
+
+    // TEMP!
     if (up)
     {
-        playerX += Math.cos(playerAngle * (Math.PI / 180.0)) * moveSpeed;
-        playerY -= Math.sin(playerAngle * (Math.PI / 180.0)) * moveSpeed;
+        playerX += fwdDir.x * moveSpeed;
+        playerY += fwdDir.y * moveSpeed;
     }
     else if (down)
     {
-        playerX -= Math.cos(playerAngle * (Math.PI / 180.0)) * moveSpeed;
-        playerY += Math.sin(playerAngle * (Math.PI / 180.0)) * moveSpeed;
+        playerX -= fwdDir.x * moveSpeed;
+        playerY -= fwdDir.y * moveSpeed;
     }
     aw.raycast(wallTexture, playerX, playerY, playerAngle);
 }

@@ -14,16 +14,16 @@ var aw = (function(public)
         return texture;
     }
 
-    public.drawColumn = function(columnIdx, top, height, texture, u1, v1, u2, v2)
+    public.drawColumn = function(columnIdx, top, height, texture, textureCol)
     {
-        let srcWidth = texture.width * (u2 - u1);
-        let srcHeight = texture.height * (v2 - v1);
-        let srcX = texture.width * u1;
-        let srcY = texture.height * v1;
+        let srcWidth = 1.0;
+        let srcHeight = texture.height;
+        let srcX = Math.floor(textureCol % texture.width);
+        let srcY = 0.0;
 
-        let dstWidth = public.columnSize;
+        let dstWidth = 1.0;
         let dstHeight = height;
-        let dstX = columnIdx * public.columnSize;
+        let dstX = columnIdx;
         let dstY = top;
 
         public.ctx.drawImage(texture, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth, dstHeight);

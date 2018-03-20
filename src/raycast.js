@@ -107,7 +107,7 @@ var aw = (function(public)
                 let fishEyeCorrection = Math.cos((angle - curAngleDeg) * (Math.PI / 180));
                 let height = (300 / (distHit * fishEyeCorrection));
                 let top = (public.height - height) * 0.5;
-                aw.drawColumn(i, top, height, wallTexture, u1, v1, u2, v2);
+                aw.drawColumn(i, top, height, wallTexture, u1 * 128 * 2.0);
                 //console.log(`${i} - ${curAngleDeg} dist: ${distHit} - ${distHit * cosAngle}`);
             }
         }

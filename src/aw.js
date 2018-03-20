@@ -4,13 +4,13 @@ var aw = (function(public)
   
     public.init = (width, height, fps, state) =>
     {
-        let canvas = document.createElement("canvas");
-        canvas.setAttribute("width", width);
-        canvas.setAttribute("height", height);
-        canvas.style.backgroundColor = "black";
-        document.getElementById("game").appendChild(canvas);
+        public.canvas = document.createElement("canvas");
+        public.canvas.setAttribute("width", width);
+        public.canvas.setAttribute("height", height);
+        public.canvas.style.backgroundColor = "black";
+        document.getElementById("game").appendChild(public.canvas);
 
-        public.ctx = canvas.getContext('2d');
+        public.ctx = public.canvas.getContext('2d');
         public.width = width;
         public.height = height;
         public.state = state;
