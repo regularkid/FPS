@@ -18,6 +18,9 @@ var playerX = 2.5;
 var playerY = 2.5;
 var playerAngle = 0;
 
+var map = new Map();
+map.addWall(new Vec(150, 50), new Vec(150, -50));
+
 var left = false;
 var right = false;
 var up = false;
@@ -91,7 +94,7 @@ function update(delta)
     let rightDir = {x: -fwdDir.y, y: fwdDir.x};
 
     // TEMP!
-    let moveSpeed = 1.0 * delta;
+    let moveSpeed = 50.0 * delta;
     if (left)
     {
         playerX -= rightDir.x * moveSpeed;
@@ -114,5 +117,7 @@ function update(delta)
         playerX -= fwdDir.x * moveSpeed;
         playerY -= fwdDir.y * moveSpeed;
     }
-    aw.raycast(wallTexture, playerX, playerY, playerAngle);
+    //aw.raycast(wallTexture, playerX, playerY, playerAngle);
+
+    aw.drawMap2D(map, playerX, playerY, playerAngle * (Math.PI / 180.0));
 }
