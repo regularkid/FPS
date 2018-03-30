@@ -16,7 +16,6 @@ class Raycast
 
     raycast(wallTexture, xMap, yMap, angle)
     {
-        let start = performance.now();
         let drawTime = 0;
 
         // TEMP
@@ -109,14 +108,8 @@ class Raycast
                 let fishEyeCorrection = Math.cos((angle - curAngleDeg) * (Math.PI / 180));
                 let height = (80 / (distHit * fishEyeCorrection));
                 let top = (aw.height - height) * 0.5;
-                let dStart = performance.now();
                 render.drawColumn(i, top, height, wallTexture, u1 * 128 * 2.0);
-                drawTime += performance.now() - dStart;
-                //console.log(`${i} - ${curAngleDeg} dist: ${distHit} - ${distHit * cosAngle}`);
             }
         }
-
-        let totalTime = (performance.now() - start) - drawTime;
-        //console.log(`Raycast: ${totalTime} Draw: ${drawTime}`);
     }
 }

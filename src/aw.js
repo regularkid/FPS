@@ -64,49 +64,40 @@ class Aw
 
         window.addEventListener("mousedown", e =>
         {
-            if (e.button == 0)
-            {
-                this.mouseLeft = true;
-            }
-            else if (e.button == 2)
-            {
-                this.mouseRight = true;
-            }            
+            if (e.button === 0) { this.mouseLeft = true; }
+            else if (e.button === 2) { this.mouseRight = true; }            
         });
 
         window.addEventListener("mouseup", e =>
         {
-            if (e.button == 0)
-            {
-                this.mouseLeft = false;
-            }
-            else if (e.button == 2)
-            {
-                this.mouseRight = false;
-            }            
+            if (e.button === 0) { this.mouseLeft = false; }
+            else if (e.button === 2) { this.mouseRight = false; }            
         });
 
-        this.keys =
+        this.keyToName =
         {
-            w: false, a: false, s: false, d: false,
-            ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
-            x: false, z: false,
+            "w": "w",  "a": "a",  "s": "s", "d": "d",
+            "ArrowUp": "up", "ArrowDown": "down", "ArrowLeft": "left", "ArrowRight": "right",
+            "z": "z", "x": "x", " ": "space",
         };
+
+        this.keys = {};
+        Object.keys(this.keyToName).forEach(key => this.keys[key] = false);
 
         window.addEventListener("keydown", e =>
         {
-            if (this.keys[e.key] !== undefined)
+            if (this.keyToName[e.key] !== undefined)
             {
-                this.keys[e.key] = true;
+                this.keys[this.keyToName[e.key]] = true;
                 e.preventDefault();
             }            
         });
 
         window.addEventListener("keyup", e =>
         {
-            if (this.keys[e.key] !== undefined)
+            if (this.keyToName[e.key] !== undefined)
             {
-                this.keys[e.key] = false;
+                this.keys[this.keyToName[e.key]] = false;
                 e.preventDefault();
             }              
         });
