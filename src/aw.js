@@ -32,7 +32,7 @@ class Aw
     {
         window.requestAnimationFrame(this.gameLoop.bind(this));
         
-        let deltaTime = Math.min((curTime - (this.lastTime || 0.0)) / 1000.0, 0.2);  // Cap to 200ms (5fps)
+        let deltaTime = Math.min((curTime - (this.lastTime || curTime)) / 1000.0, 0.2);  // Cap to 200ms (5fps)
         this.lastTime = curTime;
 
         if (this.state)
