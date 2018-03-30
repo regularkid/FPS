@@ -1,29 +1,31 @@
-var aw = (function(public)
+class Raycast
 {
-    let m_grid;
-
-    public.initRaycaster = () =>
+    constructor()
     {
-        m_grid = [];
+        this.grid = [];
+
         for (let row = 0; row < 5; row++)
         {
-            m_grid[row] = [];
+            this.grid[row] = [];
             for (let col = 0; col < 5; col++)
             {
-                m_grid[row][col] = (col === 0 || col === 4 || row === 0 || row === 4) ? 1 : 0;
+                this.grid[row][col] = (col === 0 || col === 4 || row === 0 || row === 4) ? 1 : 0;
             }
         }
     }
 
-    public.raycast = (wallTexture, xMap, yMap, angle) =>
+    raycast(wallTexture, xMap, yMap, angle)
     {
+        let start = performance.now();
+        let drawTime = 0;
+
         // TEMP
         let fov = 55;
 
         let startAngle = angle + (fov * 0.5);
-        let angleStep = fov / public.numColumns;
+        let angleStep = fov / render.numColumns;
 
-        for (let i = 0; i < public.numColumns; i++)
+        for (let i = 0; i < render.numColumns; i++)
         {
             let curAngleDeg = startAngle - (angleStep * i);
             let curAngleRad = curAngleDeg * (Math.PI / 180);
@@ -47,7 +49,7 @@ var aw = (function(public)
                 let xWall = Math.floor(xCur + (cosAngle >= 0.0 ? 0 : -1));
                 let yWall = Math.floor(yCur);
         
-                if (m_grid[yWall] !== undefined && m_grid[yWall][xWall] !== undefined && m_grid[yWall][xWall] > 0)
+                if (this.grid[yWall] !== undefined && this.grid[yWall][xWall] !== undefined && this.grid[yWall][xWall] > 0)
                 {
                     let xDist = xCur - xMap;
                     let yDist = yCur - yMap;
@@ -78,7 +80,7 @@ var aw = (function(public)
                 let yWall = Math.floor(yCur + (sinAngle >= 0.0 ? 0 : -1));
                 let xWall = Math.floor(xCur);
 
-                if (m_grid[yWall] !== undefined && m_grid[yWall][xWall] !== undefined && m_grid[yWall][xWall] > 0)
+                if (this.grid[yWall] !== undefined && this.grid[yWall][xWall] !== undefined && this.grid[yWall][xWall] > 0)
                 {
                     let xDist = xCur - xMap;
                     let yDist = yCur - yMap;
@@ -102,16 +104,19 @@ var aw = (function(public)
             if (distHit >= 0.0)
             {
                 let v1 = 0.0;
-                let u2 = u1 + (1.0 / public.numColumns);
+                let u2 = u1 + (1.0 / render.numColumns);
                 let v2 = 1.0;
                 let fishEyeCorrection = Math.cos((angle - curAngleDeg) * (Math.PI / 180));
-                let height = (300 / (distHit * fishEyeCorrection));
-                let top = (public.height - height) * 0.5;
-                aw.drawColumn(i, top, height, wallTexture, u1 * 128 * 2.0);
+                let height = (80 / (distHit * fishEyeCorrection));
+                let top = (aw.height - height) * 0.5;
+                let dStart = performance.now();
+                render.drawColumn(i, top, height, wallTexture, u1 * 128 * 2.0);
+                drawTime += performance.now() - dStart;
                 //console.log(`${i} - ${curAngleDeg} dist: ${distHit} - ${distHit * cosAngle}`);
             }
         }
+
+        let totalTime = (performance.now() - start) - drawTime;
+        //console.log(`Raycast: ${totalTime} Draw: ${drawTime}`);
     }
-     
-    return public;
-}(aw || {}));
+}

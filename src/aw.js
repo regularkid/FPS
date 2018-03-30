@@ -1,37 +1,129 @@
-var aw = (function(public)
+class Aw
 {
-    let m_lastTime = 0;
-  
-    public.init = (width, height, fps, state) =>
+    //////////////////////////
+    //-------- CORE --------//
+    //////////////////////////
+
+    constructor(width, height, scale)
     {
-        public.canvas = document.createElement("canvas");
-        public.canvas.setAttribute("width", width);
-        public.canvas.setAttribute("height", height);
-        public.canvas.style.backgroundColor = "black";
-        document.getElementById("game").appendChild(public.canvas);
+        this.initDisplay(width, height, scale);
+        this.initInput();
 
-        public.ctx = public.canvas.getContext('2d');
-        public.width = width;
-        public.height = height;
-        public.state = state;
-
-        gameLoop();
+        this.gameLoop(performance.now());
     }
 
-    gameLoop = () =>
+    initDisplay(width, height, scale)
     {
-        let curTime = Date.now();
-        let deltaTime = (curTime - m_lastTime) / 1000.0;
-        m_lastTime = curTime;
+        this.canvas = document.createElement("canvas");
+        this.canvas.setAttribute("width", width);
+        this.canvas.setAttribute("height", height);
+        this.canvas.style.width = `${width * scale}px`;
+        this.canvas.style.height = `${height * scale}px`;
+        this.canvas.style.backgroundColor = "black";
+        document.getElementById("game").appendChild(this.canvas);
 
-        public.ctx.clearRect(0, 0, public.width, public.height);
-        if (public.state)
+        this.ctx = this.canvas.getContext('2d');
+        this.width = width;
+        this.height = height;
+        this.scale = scale;
+    }
+
+    gameLoop(curTime)
+    {
+        window.requestAnimationFrame(this.gameLoop.bind(this));
+        
+        let deltaTime = Math.min((curTime - (this.lastTime || 0.0)) / 1000.0, 0.2);  // Cap to 200ms (5fps)
+        this.lastTime = curTime;
+
+        if (this.state)
         {
-            public.state(deltaTime);
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            this.state(deltaTime);
         }
 
-        window.requestAnimationFrame(gameLoop);
+        this.clearMouseDelta();
     }
-     
-    return public;
-}(aw || {}));
+
+    ///////////////////////////
+    //-------- INPUT --------//
+    ///////////////////////////
+
+    initInput()
+    {
+        this.mousePos = {x: 0, y: 0};
+        this.mouseDelta = {x: 0, y: 0};
+        this.mouseLeft = false;
+        this.mouseRight = false;
+
+        window.addEventListener("mousemove", e =>
+        {
+            this.mouseDelta.x += e.movementX;
+            this.mouseDelta.y += e.movementY;
+            this.mousePos = {x: e.clientX, y: e.clientY};
+        });
+
+        window.addEventListener("mousedown", e =>
+        {
+            if (e.button == 0)
+            {
+                this.mouseLeft = true;
+            }
+            else if (e.button == 2)
+            {
+                this.mouseRight = true;
+            }            
+        });
+
+        window.addEventListener("mouseup", e =>
+        {
+            if (e.button == 0)
+            {
+                this.mouseLeft = false;
+            }
+            else if (e.button == 2)
+            {
+                this.mouseRight = false;
+            }            
+        });
+
+        this.keys =
+        {
+            w: false, a: false, s: false, d: false,
+            ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
+            x: false, z: false,
+        };
+
+        window.addEventListener("keydown", e =>
+        {
+            if (this.keys[e.key] !== undefined)
+            {
+                this.keys[e.key] = true;
+                e.preventDefault();
+            }            
+        });
+
+        window.addEventListener("keyup", e =>
+        {
+            if (this.keys[e.key] !== undefined)
+            {
+                this.keys[e.key] = false;
+                e.preventDefault();
+            }              
+        });
+    }
+
+    clearMouseDelta()
+    {
+        this.mouseDelta.x = 0.0;
+        this.mouseDelta.y = 0.0;
+    }
+
+    enableMouseLock()
+    {
+        this.canvas.requestPointerLock = this.canvas.requestPointerLock || this.canvas.mozRequestPointerLock;
+        this.canvas.onclick = () =>
+        {
+            this.canvas.requestPointerLock();
+        }
+    }
+}
