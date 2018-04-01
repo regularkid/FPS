@@ -30,7 +30,7 @@ class Render
         //this.drawLine(dstX, top, dstX, top + height, 1.0, color);
 
         aw.ctx.fillStyle = color;
-        aw.ctx.fillRect(dstX, top, this.columnSize, height);
+        aw.ctx.fillRect(dstX, top + pitchOffset, this.columnSize, height);
     }
 
     drawLine(x1, y1, x2, y2, size, color)

@@ -20,17 +20,25 @@ aw.state = update;
 
 var curVelocity = {x: 0.0, y: 0.0};
 var velocityLerpFactor = 0.2;
+var pitchOffset = 0.0;
+var maxPitchOffset = 100.0;
 function update(delta)
 {
+    let horizonY = (aw.height * 0.5) + pitchOffset;
     aw.ctx.fillStyle = "#444444";
-    aw.ctx.fillRect(0, 0, aw.width, aw.height * 0.5);
+    aw.ctx.fillRect(0, 0, aw.width, horizonY);
     aw.ctx.fillStyle = "#AAAAAA";
-    aw.ctx.fillRect(0, aw.height * 0.5, aw.width, aw.height * 0.5);
+    aw.ctx.fillRect(0, horizonY, aw.width, aw.height - horizonY);
 
     // TEMP!
     let turnSpeed = 5.0;
-    playerAngle -= turnSpeed * delta * aw.mouseDelta.x;
+    playerAngle -= turnSpeed * aw.mouseDelta.x * delta;
     playerAngle = playerAngle % 360.0;
+
+    // TEMP!
+    let pitchSpeed = 10.0;
+    pitchOffset -= pitchSpeed * aw.mouseDelta.y * delta;
+    pitchOffset = Math.max(-maxPitchOffset, Math.min(maxPitchOffset, pitchOffset));
 
     let fwdDir = {x: Math.cos(playerAngle * (Math.PI / 180.0)), y: -Math.sin(playerAngle * (Math.PI / 180.0))};
     let rightDir = {x: -fwdDir.y, y: fwdDir.x};
