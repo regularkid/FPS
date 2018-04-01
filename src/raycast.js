@@ -235,7 +235,7 @@ class Raycast
                 }
 
                 aw.ctx.fillStyle = color;
-                aw.ctx.fillRect(borderSize + (i * gridSize), borderSize + (j * gridSize), gridSize, gridSize);
+                aw.ctx.fillRect(borderSize + (i * gridSize), borderSize + ((this.height - j - 1) * gridSize), gridSize, gridSize);
             }
         }
     }
