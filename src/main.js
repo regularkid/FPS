@@ -18,8 +18,15 @@ map.addWall(new Vec(150, 50), new Vec(150, -50));
 
 aw.state = update;
 
+var curVelocity = {x: 0.0, y: 0.0};
+var velocityLerpFactor = 0.2;
 function update(delta)
 {
+    aw.ctx.fillStyle = "#444444";
+    aw.ctx.fillRect(0, 0, aw.width, aw.height * 0.5);
+    aw.ctx.fillStyle = "#AAAAAA";
+    aw.ctx.fillRect(0, aw.height * 0.5, aw.width, aw.height * 0.5);
+
     // TEMP!
     let turnSpeed = 5.0;
     playerAngle -= turnSpeed * delta * aw.mouseDelta.x;
@@ -29,29 +36,35 @@ function update(delta)
     let rightDir = {x: -fwdDir.y, y: fwdDir.x};
 
     // TEMP!
-    let moveSpeed = 1.0 * delta;
+    let moveSpeed = aw.keys.shift ? 2.5 : 1.5;
+    let desiredVelocity = {x: 0.0, y: 0.0};
     if (aw.keys.a)
     {
-        playerX -= rightDir.x * moveSpeed;
-        playerY -= rightDir.y * moveSpeed;
+        desiredVelocity.x -= rightDir.x * moveSpeed;
+        desiredVelocity.y -= rightDir.y * moveSpeed;
     }
     else if (aw.keys.d)
     {
-        playerX += rightDir.x * moveSpeed;
-        playerY += rightDir.y * moveSpeed;
+        desiredVelocity.x += rightDir.x * moveSpeed;
+        desiredVelocity.y += rightDir.y * moveSpeed;
     }
 
     // TEMP!
     if (aw.keys.w)
     {
-        playerX += fwdDir.x * moveSpeed;
-        playerY += fwdDir.y * moveSpeed;
+        desiredVelocity.x += fwdDir.x * moveSpeed;
+        desiredVelocity.y += fwdDir.y * moveSpeed;
     }
     else if (aw.keys.s)
     {
-        playerX -= fwdDir.x * moveSpeed;
-        playerY -= fwdDir.y * moveSpeed;
+        desiredVelocity.x -= fwdDir.x * moveSpeed;
+        desiredVelocity.y -= fwdDir.y * moveSpeed;
     }
+
+    curVelocity.x += (desiredVelocity.x - curVelocity.x) * velocityLerpFactor;
+    curVelocity.y += (desiredVelocity.y - curVelocity.y) * velocityLerpFactor;
+    playerX += curVelocity.x * delta;
+    playerY += curVelocity.y * delta;
 
     raycast.raycast(wallTexture, playerX, playerY, playerAngle);
 }

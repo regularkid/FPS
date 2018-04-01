@@ -14,19 +14,23 @@ class Render
         return texture;
     }
 
-    drawColumn(columnIdx, top, height, texture, textureCol)
+    drawColumn(columnIdx, top, height, color)
     {
-        let srcWidth = 1.0;
-        let srcHeight = texture.height;
-        let srcX = Math.floor(textureCol % texture.width);
-        let srcY = 0.0;
+        // let srcWidth = 1.0;
+        // let srcHeight = texture.height;
+        // let srcX = Math.floor(textureCol % texture.width);
+        // let srcY = 0.0;
 
-        let dstWidth = this.columnSize;
-        let dstHeight = height;
+        // let dstWidth = this.columnSize;
+        // let dstHeight = height;
         let dstX = columnIdx * this.columnSize;
-        let dstY = top;
+        //let dstY = top;
 
-        aw.ctx.drawImage(texture, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth, dstHeight);
+        //aw.ctx.drawImage(texture, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth, dstHeight);
+        //this.drawLine(dstX, top, dstX, top + height, 1.0, color);
+
+        aw.ctx.fillStyle = color;
+        aw.ctx.fillRect(dstX, top, this.columnSize, height);
     }
 
     drawLine(x1, y1, x2, y2, size, color)

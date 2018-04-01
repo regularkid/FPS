@@ -9,9 +9,25 @@ class Raycast
             this.grid[row] = [];
             for (let col = 0; col < 5; col++)
             {
-                this.grid[row][col] = (col === 0 || col === 4 || row === 0 || row === 4) ? 1 : 0;
+                let isOuterWall = col === 0 || col === 4 || row === 0 || row === 4;
+                if (isOuterWall)
+                {
+                    this.grid[row][col] = (col !== 0 && row !== 0) ? 1 : 2;
+                }
+                else
+                {
+                    this.grid[row][col] = 0;
+                }
             }
         }
+
+        this.colorLookup =
+        [
+            {light: "#000000", dark: "#000000"},
+            {light: "#FF0000", dark: "#880000"},
+            {light: "#00FF00", dark: "#008800"},
+            {light: "#0000FF", dark: "#000088"},
+        ];
     }
 
     raycast(wallTexture, xMap, yMap, angle)
@@ -19,7 +35,7 @@ class Raycast
         let drawTime = 0;
 
         // TEMP
-        let fov = 55;
+        let fov = 60;
 
         let startAngle = angle + (fov * 0.5);
         let angleStep = fov / render.numColumns;
@@ -34,6 +50,8 @@ class Raycast
             let xHit = -1;
             let yHit = -1;
             let u1 = 0.0;
+            let isVertical = false;
+            let wallId = 0;
 
             // Vertical grid lines
             let slope = sinAngle / cosAngle;
@@ -57,6 +75,8 @@ class Raycast
                     xHit = xCur;
                     yHit = yCur;
                     u1 = yHit % 1.0;
+                    isVertical = true;
+                    wallId = this.grid[yWall][xWall];
                     break;
                 }
 
@@ -90,6 +110,8 @@ class Raycast
                         xHit = xCur;
                         yHit = yCur;
                         u1 = xHit % 1.0;
+                        isVertical = false;
+                        wallId = this.grid[yWall][xWall];
                         break;
                     }
                 }
@@ -106,9 +128,17 @@ class Raycast
                 let u2 = u1 + (1.0 / render.numColumns);
                 let v2 = 1.0;
                 let fishEyeCorrection = Math.cos((angle - curAngleDeg) * (Math.PI / 180));
-                let height = (80 / (distHit * fishEyeCorrection));
+                distHit *= fishEyeCorrection;
+                let height = (1.0 / distHit) * 200.0;
                 let top = (aw.height - height) * 0.5;
-                render.drawColumn(i, top, height, wallTexture, u1 * 128 * 2.0);
+
+                let color = isVertical ? this.colorLookup[wallId].light : this.colorLookup[wallId].dark;
+                let segmentDividerFraction = 0.01;
+                if (u1 <= segmentDividerFraction || u1 >= 1.0 - segmentDividerFraction)
+                {
+                    color = "#000000";
+                }
+                render.drawColumn(i, top, height, color);
             }
         }
     }

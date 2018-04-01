@@ -77,8 +77,8 @@ class Aw
         this.keyToName =
         {
             "w": "w",  "a": "a",  "s": "s", "d": "d",
-            "ArrowUp": "up", "ArrowDown": "down", "ArrowLeft": "left", "ArrowRight": "right",
-            "z": "z", "x": "x", " ": "space",
+            "arrowup": "up", "arrowdown": "down", "arrowleft": "left", "arrowright": "right",
+            "z": "z", "x": "x", " ": "space", "shift": "shift",
         };
 
         this.keys = {};
@@ -86,21 +86,23 @@ class Aw
 
         window.addEventListener("keydown", e =>
         {
-            if (this.keyToName[e.key] !== undefined)
-            {
-                this.keys[this.keyToName[e.key]] = true;
-                e.preventDefault();
-            }            
+            this.setKeyState(e, true);
         });
 
         window.addEventListener("keyup", e =>
         {
-            if (this.keyToName[e.key] !== undefined)
-            {
-                this.keys[this.keyToName[e.key]] = false;
-                e.preventDefault();
-            }              
+            this.setKeyState(e, false);
         });
+    }
+
+    setKeyState(event, isOn)
+    {
+        let keyCode = event.key.toLowerCase();
+        if (this.keyToName[keyCode] !== undefined)
+        {
+            this.keys[this.keyToName[keyCode]] = isOn;
+            event.preventDefault();
+        }
     }
 
     clearMouseDelta()
