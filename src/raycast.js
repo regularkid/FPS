@@ -2,24 +2,24 @@ class Raycast
 {
     constructor()
     {
-        this.grid = [];
+        // this.grid = [];
 
-        for (let row = 0; row < 5; row++)
-        {
-            this.grid[row] = [];
-            for (let col = 0; col < 5; col++)
-            {
-                let isOuterWall = col === 0 || col === 4 || row === 0 || row === 4;
-                if (isOuterWall)
-                {
-                    this.grid[row][col] = (col !== 0 && row !== 0) ? 1 : 2;
-                }
-                else
-                {
-                    this.grid[row][col] = 0;
-                }
-            }
-        }
+        // for (let row = 0; row < 5; row++)
+        // {
+        //     this.grid[row] = [];
+        //     for (let col = 0; col < 5; col++)
+        //     {
+        //         let isOuterWall = col === 0 || col === 4 || row === 0 || row === 4;
+        //         if (isOuterWall)
+        //         {
+        //             this.grid[row][col] = (col !== 0 && row !== 0) ? 1 : 2;
+        //         }
+        //         else
+        //         {
+        //             this.grid[row][col] = 0;
+        //         }
+        //     }
+        // }
 
         this.colorLookup =
         [
@@ -28,6 +28,79 @@ class Raycast
             {light: "#00FF00", dark: "#008800"},
             {light: "#0000FF", dark: "#000088"},
         ];
+
+        this.generateMap();
+    }
+
+    generateMap()
+    {
+        this.grid = [];
+        this.width = 11;
+        this.height = 11;
+ 
+        let moves = [];
+        for(var i = 0; i < this.width; i ++)
+        {
+            this.grid[i] = [];
+            for(var j = 0; j < this.height; j ++)
+            {
+                this.grid[i][j] = 1;
+            }
+        }
+
+        let posX = 1;
+        let posY = 1;
+        this.grid[posX][posY] = 0; 
+        moves.push(posY + posY * this.width);
+        while (moves.length > 0)
+        {
+            var possibleDirections = "";
+            if(posX+2 > 0 && posX + 2 < this.height - 1 && this.grid[posX + 2][posY] == 1){
+                    possibleDirections += "S";
+            }
+            if(posX-2 > 0 && posX - 2 < this.height - 1 && this.grid[posX - 2][posY] == 1){
+                    possibleDirections += "N";
+            }
+            if(posY-2 > 0 && posY - 2 < this.width - 1 && this.grid[posX][posY - 2] == 1){
+                    possibleDirections += "W";
+            }
+            if(posY+2 > 0 && posY + 2 < this.width - 1 && this.grid[posX][posY + 2] == 1){
+                    possibleDirections += "E";
+            } 
+            if(possibleDirections)
+            {
+                    var move = Math.floor(Math.random() * possibleDirections.length);
+                    switch (possibleDirections[move]){
+                        case "N": 
+                            this.grid[posX - 2][posY] = 0;
+                            this.grid[posX - 1][posY] = 0;
+                            posX -= 2;
+                            break;
+                        case "S":
+                            this.grid[posX + 2][posY] = 0;
+                            this.grid[posX + 1][posY] = 0;
+                            posX += 2;
+                            break;
+                        case "W":
+                            this.grid[posX][posY - 2] = 0;
+                            this.grid[posX][posY - 1] = 0;
+                            posY -= 2;
+                            break;
+                        case "E":
+                            this.grid[posX][posY + 2]=0;
+                            this.grid[posX][posY + 1]=0;
+                            posY += 2;
+                            break;         
+                    }
+                    moves.push(posY + posX * this.width);     
+            }
+            else
+            {
+                    var back = moves.pop();
+                    posX = Math.floor(back / this.width);
+                    posY = back % this.width;
+            }                                      
+        }      
     }
 
     raycast(wallTexture, xMap, yMap, angle)
@@ -61,7 +134,7 @@ class Raycast
 	        let yCur = yMap + (xCur - xMap) * slope;
 
             let timeout = 20;
-            while (isFinite(slope) && !isNaN(slope) && xCur >= 0 && xCur < 5 && yCur >= 0 && yCur < 5 && timeout > 0)
+            while (isFinite(slope) && !isNaN(slope) && xCur >= 0 && xCur < this.width && yCur >= 0 && yCur < this.height && timeout > 0)
             {
                 let xWall = Math.floor(xCur + (cosAngle >= 0.0 ? 0 : -1));
                 let yWall = Math.floor(yCur);
@@ -94,7 +167,7 @@ class Raycast
 	        xCur = xMap + (yCur - yMap) * slope;
 
             timeout = 20;
-            while (isFinite(slope) && !isNaN(slope) && xCur >= 0 && xCur < 5 && yCur >= 0 && yCur < 5 && timeout > 0)
+            while (isFinite(slope) && !isNaN(slope) && xCur >= 0 && xCur < this.width && yCur >= 0 && yCur < this.height && timeout > 0)
             {
                 let yWall = Math.floor(yCur + (sinAngle >= 0.0 ? 0 : -1));
                 let xWall = Math.floor(xCur);
@@ -139,6 +212,30 @@ class Raycast
                     color = "#000000";
                 }
                 render.drawColumn(i, top, height, color);
+            }
+        }
+    }
+
+    drawMap(playerX, playerY)
+    {
+        let gridSize = 5;
+        let borderSize = 2;
+
+        aw.ctx.fillStyle = "#000000";
+        aw.ctx.fillRect(0, 0, (this.width * gridSize) + (borderSize * 2.0), (this.height * gridSize) + (borderSize * 2.0));
+
+        for(var i = 0; i < this.width; i ++)
+        {
+            for(var j = 0; j < this.height; j ++)
+            {
+                let color = this.colorLookup[this.grid[i][j]].light;
+                if (Math.floor(playerX) == j && Math.floor(playerY) == i)
+                {
+                    color = "#00FF00";
+                }
+
+                aw.ctx.fillStyle = color;
+                aw.ctx.fillRect(borderSize + (i * gridSize), borderSize + (j * gridSize), gridSize, gridSize);
             }
         }
     }

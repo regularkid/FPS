@@ -9,8 +9,8 @@ var render = new Render(screenWidth);
 aw.enableMouseLock();
 
 var wallTexture = render.loadTexture("assets/wall.png");
-var playerX = 2.5;
-var playerY = 2.5;
+var playerX = 1.5;
+var playerY = 1.5;
 var playerAngle = 0;
 
 var map = new Map();
@@ -67,4 +67,5 @@ function update(delta)
     playerY += curVelocity.y * delta;
 
     raycast.raycast(wallTexture, playerX, playerY, playerAngle);
+    raycast.drawMap(playerX, playerY);
 }
